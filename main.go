@@ -3,6 +3,7 @@ package main
 import (
 	"machine"
 	"machine/usb"
+	"macropad/midi"
 	"time"
 )
 
@@ -12,7 +13,7 @@ func main() {
 	usb.Product = "jyx-controller"
 	// port := midi.Port()
 	//kb := keyboard.Port()
-	var button *midiButton = NewMidiButton(machine.GP7, 1)
+	var button *midi.MidiControlButton = midi.NewMidiControlButton(machine.GP7, 1, 0, 1).Init()
 
 	boardLED.High()
 	ticker := time.NewTicker(time.Millisecond * 20)
