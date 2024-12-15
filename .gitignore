@@ -1,2 +1,3 @@
 .tinygo.toml
 *.elf
+.autorun
