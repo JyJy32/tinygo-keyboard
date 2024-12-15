@@ -1,2 +1,2 @@
-.tinygo
+.tinygo.toml
 *.elf
