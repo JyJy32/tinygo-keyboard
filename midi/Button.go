@@ -1,6 +1,7 @@
 package midi
 
 import (
+	"errors"
 	"machine"
 	"machine/usb/adc/midi"
 )
@@ -22,15 +23,25 @@ type MidiControlButton struct {
 	bounce  uint8
 }
 
-func NewMidiControlButton(pin machine.Pin, channel uint8, controller uint8, value uint8) *MidiControlButton {
+// NewMidiControlButton create new midi control button
+// params:
+//
+//	pin machine.Pin   the gpio pin on the microcontroller
+//	channel uint8     [[1;16]] value defining the channel
+//	controller        [[0;127]] value defining the controller
+//	value             [[0;127]] value to send
+func NewMidiControlButton(pin machine.Pin, channel uint8, controller uint8, value uint8) (*MidiControlButton, error) {
 	b := new(MidiControlButton)
 	b.pin = pin
+	if channel > 16 || channel < 1 {
+		return nil, errors.New("invalid channel")
+	}
 	b.channel = channel
 	b.controller = controller
 	b.value = value
 	b.r_value = 0
 	b.bounce = 0
-	return b
+	return b, nil
 }
 
 func (b *MidiControlButton) Init() *MidiControlButton {
@@ -55,6 +66,7 @@ func (b *MidiControlButton) OnTick() {
 
 type MidiNoteButton struct {
 	pin        machine.Pin
+	channel    uint8
 	note       uint8
 	velocity   uint8
 	r_velocity uint8
@@ -63,16 +75,27 @@ type MidiNoteButton struct {
 	bounce  uint8
 }
 
-func newMidiNoteButton(pin machine.Pin, note uint8, vel uint8) *MidiNoteButton {
+// NewMidiControlButton create new midi control button
+// params:
+//
+//	pin machine.Pin   the gpio pin on the microcontroller
+//	channel uint8     [[1;16]] value defining the channel
+//	note              [[0;127]] value to send
+//	vel               velocity
+func newMidiNoteButton(pin machine.Pin, channel uint8, note uint8, vel uint8) (*MidiNoteButton, error) {
 	b := new(MidiNoteButton)
 	b.pin = pin
+	if channel > 16 || channel < 1 {
+		return nil, errors.New("invalid channel")
+	}
+	b.channel = channel
 	b.note = note
 	b.velocity = vel
 
 	b.r_velocity = 0
 	b.pressed = false
 	b.bounce = 0
-	return b
+	return b, nil
 }
 
 func (b *MidiNoteButton) init() *MidiNoteButton {
