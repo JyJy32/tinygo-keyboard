@@ -10,6 +10,10 @@ var (
 	debounce uint8 = 8
 )
 
+type MidiButton interface {
+	OnTick() error
+}
+
 type MidiControlButton struct {
 	pin        machine.Pin
 	channel    uint8
@@ -49,10 +53,10 @@ func (b *MidiControlButton) Init() *MidiControlButton {
 	return b
 }
 
-func (b *MidiControlButton) OnTick() {
+func (b *MidiControlButton) OnTick() error {
 	if b.bounce != 0 {
 		b.bounce -= 1
-		return
+		return nil
 	}
 	if b.pin.Get() && !b.pressed {
 		midi.Port().ControlChange(0, b.channel, b.controller, b.value)
@@ -60,8 +64,10 @@ func (b *MidiControlButton) OnTick() {
 		b.pressed = true
 	} else if !b.pin.Get() && b.pressed {
 		midi.Port().ControlChange(0, b.channel, b.controller, b.r_value)
+		b.bounce = debounce
 		b.pressed = false
 	}
+	return nil
 }
 
 type MidiNoteButton struct {
@@ -103,10 +109,10 @@ func (b *MidiNoteButton) init() *MidiNoteButton {
 	return b
 }
 
-func (b *MidiNoteButton) OnTick() {
+func (b *MidiNoteButton) OnTick() error {
 	if b.bounce != 0 {
 		b.bounce -= 1
-		return
+		return nil
 	}
 	if b.pin.Get() && !b.pressed {
 		midi.Port().NoteOn(0, 0, midi.Note(b.note), b.velocity)
@@ -114,6 +120,8 @@ func (b *MidiNoteButton) OnTick() {
 		b.pressed = true
 	} else if !b.pin.Get() && b.pressed {
 		midi.Port().NoteOff(0, 0, midi.Note(b.note), b.r_velocity)
+		b.bounce = debounce
 		b.pressed = false
 	}
+	return nil
 }
