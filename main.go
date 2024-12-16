@@ -15,8 +15,7 @@ func main() {
 	//kb := keyboard.Port()
 	board := new(midi.Board)
 
-	// I have 9 buttons
-	button_pins := [9]machine.Pin{
+	button_pins := [...]machine.Pin{
 		machine.GP7,
 		machine.GP8,
 		machine.GP9,
@@ -32,11 +31,6 @@ func main() {
 		button.Init()
 		board.AddButton(button)
 	}
-	// removing yhis coz I think I am smart enough to not do this wrong
-	//	if err != nil {
-	//		log.Fatal(err)
-	//		return
-	//	}
 
 	boardLED.High()
 	ticker := time.NewTicker(time.Millisecond * 10)

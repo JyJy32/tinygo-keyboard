@@ -8,8 +8,7 @@ import (
 
 var debounce time.Duration = time.Millisecond * 8
 
-type OnDownCallback func(pin machine.Pin, key keyboard.Keycode)
-type OnUpCallback func(pin machine.Pin, key keyboard.Keycode)
+type Callback func(pin machine.Pin, key keyboard.Keycode)
 
 type Button struct {
 	pin machine.Pin
@@ -18,8 +17,8 @@ type Button struct {
 	pressed   bool
 	released  bool
 	lastPress time.Time
-	onDown    OnDownCallback
-	onUp      OnUpCallback
+	onDown    Callback
+	onUp      Callback
 }
 
 func NewButton(pin machine.Pin, key keyboard.Keycode) *Button {
@@ -35,7 +34,7 @@ func (b *Button) Init() *Button {
 	return b
 }
 
-func (b *Button) OnTick() {
+func (b *Button) OnTick() error {
 	if b.pressed {
 		b.OnDownCallback()
 		b.pressed = false
@@ -43,6 +42,7 @@ func (b *Button) OnTick() {
 		b.OnUpCallback()
 		b.released = false
 	}
+	return nil
 }
 
 func (b *Button) OnDownCallback() {
@@ -54,13 +54,18 @@ func (b *Button) OnDownCallback() {
 	}
 }
 
-func (b *Button) SetOnDown(fn OnDownCallback) *Button {
+func (b *Button) SetOnDown(fn Callback) *Button {
 	b.onDown = fn
 	return b
 }
 
 func (b *Button) OnUpCallback() {
 
+}
+
+func (b *Button) SetOnUp(fn Callback) *Button {
+	b.onUp = fn
+	return b
 }
 
 func (b *Button) interrupt(pin machine.Pin) {
