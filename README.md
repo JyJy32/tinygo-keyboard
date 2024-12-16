@@ -21,9 +21,7 @@ tinygo flash -target=pico gpio_keyboard.go
 create a new go project and add it to it,
 ```sh
 go mod init
-go get github.com/JyJy32/macropad
-
-
+go get github.com/JyJy32/tinygo-keyboard
 ```
-```
+or copy the files into your project 
 ```
