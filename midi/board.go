@@ -1,7 +1,7 @@
 package midi
 
 type Board struct {
-	buttons []MidiButton
+	buttons []*MidiControlButton
 }
 
 func (b *Board) OnTick() error {
@@ -14,6 +14,6 @@ func (b *Board) OnTick() error {
 	return nil
 }
 
-func (b *Board) AddButton(button MidiButton) {
+func (b *Board) AddButton(button *MidiControlButton) {
 	b.buttons = append(b.buttons, button)
 }

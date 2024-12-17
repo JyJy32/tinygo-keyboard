@@ -8,11 +8,12 @@ import (
 )
 
 func main() {
+	// led to see that the config worked
 	boardLED := machine.LED
 	boardLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+
 	usb.Product = "jyx-controller"
-	// port := midi.Port()
-	//kb := keyboard.Port()
+
 	board := new(midi.Board)
 
 	button_pins := [...]machine.Pin{
@@ -27,20 +28,17 @@ func main() {
 		machine.GP2,
 	}
 	for i := range 9 {
-		button, _ := midi.NewMidiControlButton(button_pins[i], 1, uint8(i), 1)
-		button.Init()
+		button := midi.NewMidiControlButton(button_pins[i], 1, uint8(i), 1).
+			Init()
 		board.AddButton(button)
 	}
 
 	boardLED.High()
-	ticker := time.NewTicker(time.Millisecond * 10)
+	ticker := time.NewTicker(time.Millisecond)
 	for range ticker.C {
-		board.OnTick()
+		err := board.OnTick()
+		if err != nil {
+			break
+		}
 	}
-}
-
-// TODO: this will eventually be where the actual loop is
-func run() error {
-
-	return nil
 }
