@@ -1,12 +1,12 @@
 # Jy's tinygo keyboard example
 
-This code allows a microcontroller like the raspberry pi pico act as a HID 
+This code allows a microcontroller like the raspberry pi pico act as a keyboard or MIDI controller
 
-To test be sure to have [go](https://go.dev/doc/install) and [tinygo](https://tinygo.org/getting-started/install/) installed
+To use this code be sure to have [go](https://go.dev/doc/install) and [tinygo](https://tinygo.org/getting-started/install/) installed
 
 ## Status
 
-This is currently very much a W.I.P. but you can see the intended working here  
+The examples work 
 
 ## Examples
 In the example folder you will find code for a basic gpio keyboard
