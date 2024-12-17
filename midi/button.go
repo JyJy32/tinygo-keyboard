@@ -97,7 +97,6 @@ func (b *MidiControlButton) SetOnUp(fn Callback) *MidiControlButton {
 
 func (b *MidiControlButton) interrupt(pin machine.Pin) {
 	now := time.Now()
-	print("pressed")
 	if now.Sub(b.lastPress) > debounce {
 		state := pin.Get()
 		b.pressed = state
