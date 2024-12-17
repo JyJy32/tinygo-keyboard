@@ -30,13 +30,15 @@ func NewButton(pin machine.Pin, key keyboard.Keycode) *Button {
 
 func (b *Button) Init() *Button {
 	b.pin.Configure(machine.PinConfig{Mode: machine.PinInput})
-	b.pin.SetInterrupt(machine.PinRising, b.interrupt)
+	b.pin.SetInterrupt(machine.PinRising, b.interruptR)
+	b.pin.SetInterrupt(machine.PinFalling, b.interruptF)
+
 	return b
 }
 
 func (b *Button) OnTick() error {
 	if b.pressed {
-		b.OnDownCallback()
+		b.onDownCallback()
 		b.pressed = false
 	} else if b.released {
 		b.OnUpCallback()
@@ -45,7 +47,7 @@ func (b *Button) OnTick() error {
 	return nil
 }
 
-func (b *Button) OnDownCallback() {
+func (b *Button) onDownCallback() {
 	// if different behavior is defined do that else just press key
 	if b.onDown != nil {
 		b.onDown(b.pin, b.key)
@@ -60,7 +62,9 @@ func (b *Button) SetOnDown(fn Callback) *Button {
 }
 
 func (b *Button) OnUpCallback() {
-
+	if b.onUp != nil {
+		b.onUp(b.pin, b.key)
+	}
 }
 
 func (b *Button) SetOnUp(fn Callback) *Button {
@@ -68,10 +72,18 @@ func (b *Button) SetOnUp(fn Callback) *Button {
 	return b
 }
 
-func (b *Button) interrupt(pin machine.Pin) {
+func (b *Button) interruptR(pin machine.Pin) {
 	now := time.Now()
 	if now.Sub(b.lastPress) > debounce {
 		b.pressed = true
+		b.lastPress = now
+	}
+}
+
+func (b *Button) interruptF(pin machine.Pin) {
+	now := time.Now()
+	if now.Sub(b.lastPress) > debounce {
+		b.released = true
 		b.lastPress = now
 	}
 }
