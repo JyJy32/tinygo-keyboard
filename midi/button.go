@@ -18,6 +18,11 @@ type Callback func(pin machine.Pin, channel uint8, controller uint8)
 //	controller  uint8       control to send
 //	value       uint8       value to send on button down
 //	r_value     uint8       value to send on button up
+//	pressed     bool        pressed flag
+//	released    bool        release flag
+//	lastPress   time.Time   when the button was last pressed, used for debounce
+//	onDown      Callback    callback to run on button press
+//	onUp        Callback    callback to run on button release
 type MidiControlButton struct {
 	pin        machine.Pin
 	channel    uint8
@@ -49,6 +54,9 @@ func NewMidiControlButton(pin machine.Pin, channel uint8, controller uint8, valu
 	return b
 }
 
+// set the pinmode and the interrupt
+// returns self for method chaining
+// returns: *MidiControlButton
 func (b *MidiControlButton) Init() *MidiControlButton {
 	b.pin.Configure(machine.PinConfig{Mode: machine.PinInput})
 	b.pin.SetInterrupt(machine.PinToggle, b.interrupt)
@@ -56,6 +64,7 @@ func (b *MidiControlButton) Init() *MidiControlButton {
 	return b
 }
 
+// function to run in the program loop
 func (b *MidiControlButton) OnTick() error {
 	if b.pressed {
 		b.onDownCallback()
@@ -94,6 +103,8 @@ func (b *MidiControlButton) SetOnUp(fn Callback) *MidiControlButton {
 	return b
 }
 
+// be aware that if the button is released withing the time frame of the debounce delay
+// it will not set the release flag
 func (b *MidiControlButton) interrupt(pin machine.Pin) {
 	now := time.Now()
 	if now.Sub(b.lastPress) > debounce {
