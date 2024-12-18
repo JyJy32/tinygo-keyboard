@@ -25,12 +25,11 @@ type MidiControlButton struct {
 	value      uint8
 	r_value    uint8 // default to 0
 
-	pressed      bool
-	released     bool
-	lastPress    time.Time
-	lastReleased time.Time
-	onDown       Callback
-	onUp         Callback
+	pressed   bool
+	released  bool
+	lastPress time.Time
+	onDown    Callback
+	onUp      Callback
 }
 
 // NewMidiControlButton create new midi control button
