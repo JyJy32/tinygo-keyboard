@@ -30,7 +30,7 @@ func NewButton(pin machine.Pin, key keyboard.Keycode) *Button {
 
 func (b *Button) Init() *Button {
 	b.pin.Configure(machine.PinConfig{Mode: machine.PinInput})
-	b.pin.SetInterrupt(machine.PinRising, b.interrupt)
+	b.pin.SetInterrupt(machine.PinToggle, b.interrupt)
 
 	return b
 }
@@ -52,6 +52,7 @@ func (b *Button) onDownCallback() {
 		b.onDown(b.pin, b.key)
 	} else {
 		keyboard.Port().Press(b.key)
+		println("DOWN")
 	}
 }
 
@@ -73,6 +74,7 @@ func (b *Button) SetOnUp(fn Callback) *Button {
 
 func (b *Button) interrupt(pin machine.Pin) {
 	now := time.Now()
+	println("inter")
 	if now.Sub(b.lastPress) > debounce {
 		state := pin.Get()
 		b.pressed = state

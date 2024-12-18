@@ -3,7 +3,7 @@ package midi
 
 import "machine"
 
-func New(pinA, pinB machine.Pin) *Encoder {
+func NewEncoder(pinA, pinB machine.Pin) *Encoder {
 	return &Encoder{pinA: pinA, pinB: pinB}
 }
 
@@ -13,6 +13,10 @@ type Encoder struct {
 
 	hAB   uint8
 	value uint8
+	cw    bool
+	ccw   bool
+	onCW  Callback
+	onCCW Callback
 }
 
 func (e *Encoder) Init() *Encoder {
@@ -21,6 +25,18 @@ func (e *Encoder) Init() *Encoder {
 	e.pinA.SetInterrupt(machine.PinToggle, e.interrupt)
 	e.pinB.SetInterrupt(machine.PinToggle, e.interrupt)
 	return e
+}
+
+func (e *Encoder) OnTick() error {
+	if e.cw {
+		e.onClockWise()
+		e.cw = false
+	}
+	if e.ccw {
+		e.onCounterClockWise()
+		e.ccw = false
+	}
+	return nil
 }
 
 func (e *Encoder) interrupt(pin machine.Pin) {
@@ -38,15 +54,30 @@ func (e *Encoder) interrupt(pin machine.Pin) {
 	// only need the first 4
 	switch e.hAB & 0x0F {
 	case 2, 11, 13, 4:
-		e.cw()
+		e.cw = true
 	case 1, 7, 14, 8:
-		e.ccw()
+		e.ccw = true
 	}
 }
 
-func (e *Encoder) cw() {
-	println("CLOCK WISE")
+func (e *Encoder) SetonCW(fn Callback) *Encoder {
+	e.onCW = fn
+	return e
 }
-func (e *Encoder) ccw() {
-	println("COUNTER CLOCK WISE")
+
+func (e *Encoder) SetonCCW(fn Callback) *Encoder {
+	e.onCCW = fn
+	return e
+}
+
+func (e *Encoder) onClockWise() {
+	if e.onCW != nil {
+		e.onCW(e.pinA, 0, 0)
+	}
+}
+
+func (e *Encoder) onCounterClockWise() {
+	if e.onCCW != nil {
+		e.onCCW(e.pinB, 0, 0)
+	}
 }

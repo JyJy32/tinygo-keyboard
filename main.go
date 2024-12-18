@@ -3,6 +3,7 @@ package main
 import (
 	"machine"
 	"machine/usb"
+	md "machine/usb/adc/midi"
 	"macropad/midi"
 	"time"
 )
@@ -15,6 +16,14 @@ func main() {
 	usb.Product = "jyx-controller"
 
 	board := new(midi.Board)
+	encoder := midi.NewEncoder(machine.GP0, machine.GP1).
+		Init().
+		SetonCW(func(pin machine.Pin, channel, controller uint8) {
+			md.Port().ControlChange(0, 9, 15, 0)
+		}).
+		SetonCCW(func(pin machine.Pin, channel, controller uint8) {
+			md.Port().ControlChange(0, 9, 15, 127)
+		})
 
 	button_pins := [...]machine.Pin{
 		machine.GP7,
@@ -37,6 +46,7 @@ func main() {
 	ticker := time.NewTicker(time.Millisecond)
 	for range ticker.C {
 		err := board.OnTick()
+		encoder.OnTick()
 		if err != nil {
 			break
 		}
