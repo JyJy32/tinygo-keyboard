@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var debounce time.Duration = time.Millisecond * 80
+var debounce time.Duration = time.Millisecond * 40
 
 type Callback func(pin machine.Pin, channel uint8, controller uint8)
 
@@ -106,9 +106,9 @@ func (b *MidiControlButton) SetOnUp(fn Callback) *MidiControlButton {
 // be aware that if the button is released withing the time frame of the debounce delay
 // it will not set the release flag
 func (b *MidiControlButton) interrupt(pin machine.Pin) {
+	state := pin.Get()
 	now := time.Now()
 	if now.Sub(b.lastPress) > debounce {
-		state := pin.Get()
 		b.pressed = state
 		b.released = !state
 		b.lastPress = now

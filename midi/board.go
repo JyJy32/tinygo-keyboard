@@ -4,6 +4,11 @@ type Board struct {
 	buttons []*MidiControlButton
 }
 
+func (b *Board) AddButton(button *MidiControlButton) *Board {
+	b.buttons = append(b.buttons, button)
+	return b
+}
+
 func (b *Board) OnTick() error {
 	for _, button := range b.buttons {
 		err := button.OnTick()
@@ -12,8 +17,4 @@ func (b *Board) OnTick() error {
 		}
 	}
 	return nil
-}
-
-func (b *Board) AddButton(button *MidiControlButton) {
-	b.buttons = append(b.buttons, button)
 }

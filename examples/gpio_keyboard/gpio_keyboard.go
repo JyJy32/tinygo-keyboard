@@ -4,7 +4,6 @@ import (
 	"machine"
 	kb "machine/usb/hid/keyboard"
 	"macropad/keyboard"
-	"macropad/midi"
 	"time"
 )
 
@@ -40,16 +39,14 @@ func main() {
 	}
 
 	// TODO: this should maybe be part of the board struct
-	encoder := midi.NewEncoder(machine.GP0, machine.GP1).
+	encoder := keyboard.NewEncoder(machine.GP0, machine.GP1).
 		Init().
-		SetonCW(func(pin machine.Pin, channel, control uint8) {
-			println("HELP")
+		SetonCW(func(pin machine.Pin, key kb.Keycode) {
 			kb.Port().Press(kb.KeyMediaVolumeInc)
 		}).
-		SetonCCW(func(pin machine.Pin, channel, control uint8) {
+		SetonCCW(func(pin machine.Pin, key kb.Keycode) {
 			kb.Port().Press(kb.KeyMediaVolumeDec)
 		})
-
 	board := keyboard.Board{}
 
 	for _, btn := range buttons {
