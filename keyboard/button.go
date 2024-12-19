@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var debounce time.Duration = time.Millisecond * 8
+var debounce time.Duration = time.Millisecond * 80
 
 type Callback func(pin machine.Pin, key keyboard.Keycode)
 
@@ -52,7 +52,6 @@ func (b *Button) onDownCallback() {
 		b.onDown(b.pin, b.key)
 	} else {
 		keyboard.Port().Press(b.key)
-		println("DOWN")
 	}
 }
 
@@ -74,7 +73,6 @@ func (b *Button) SetOnUp(fn Callback) *Button {
 
 func (b *Button) interrupt(pin machine.Pin) {
 	now := time.Now()
-	println("inter")
 	if now.Sub(b.lastPress) > debounce {
 		state := pin.Get()
 		b.pressed = state
